@@ -1,10 +1,15 @@
-let lowQualityStream = "http://streams.extrafm.hr:8110/stream";
-let highQualityStream = "http://streams.extrafm.hr:8110/stream";
+//put stream link here
+////////////////////////////////////
 let shoutCast = "http://streams.extrafm.hr:8110/";
+let sid = "1"
+    ///////////////////////////////////
+let lowQualityStream = shoutCast + "stream";
+let highQualityStream = shoutCast + "stream";
+
+let currentSong = shoutCast + "currentsong?sid=" + sid
+let historySongs = shoutCast + "played?sid=" + sid
 let corsProxy = "https://api.codetabs.com/v1/proxy/?quest=";
-let currentSong = "http://streams.extrafm.hr:8110/currentsong?sid=1"
-let historySongs = "http://streams.extrafm.hr:8110/played?sid=1"
-    // this is done to fix caching issues
+// this is done to fix caching issues
 function getNewRandomizedLink(linkStream) {
     return linkStream + "?" + Math.floor((Math.random() * 10000) + 1);
 }
@@ -121,50 +126,3 @@ document.getElementById('on').addEventListener('click', (evt) => {
     element.classList.remove("fa-pause");
     element.classList.add("fa-play");
 })
-
-function getStreamingData() {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-
-        if (this.readyState === 4 && this.status === 200) {
-
-            if (this.response.length === 0) {
-                console.log('%cdebug', 'font-size: 22px')
-            }
-
-            var data = JSON.parse(this.responseText);
-
-            var page = new Page();
-
-            var currentSongElement = document.getElementById('currentSong').innerHTML.replace(/&apos;/g, '\'');
-            let currentSongEl = currentSongElement.replace(/&amp;/g, '&');
-
-            // Formating characters to UTF-8
-            let song = data.currentSong.replace(/&apos;/g, '\'');
-            let currentSong = song.replace(/&amp;/g, '&');
-
-            let artist = data.currentArtist.replace(/&apos;/g, '\'');
-            let currentArtist = artist.replace(/&amp;/g, '&');
-            currentArtist = currentArtist.replace('  ', ' ');
-
-            // Change the title
-            document.title = currentSong + ' - ' + currentArtist + ' | ' + RADIO_NAME;
-
-            if (currentSongEl.trim() !== currentSong.trim()) {
-                page.refreshCover(currentSong, currentArtist);
-                page.refreshCurrentSong(currentSong, currentArtist);
-                page.refreshLyric(currentSong, currentArtist);
-
-                for (var i = 0; i < 2; i++) {
-                    page.refreshHistoric(data.songHistory[i], i);
-                }
-            }
-        }
-    };
-
-    var d = new Date();
-
-    // Requisition with timestamp to prevent cache on mobile devices
-    xhttp.open('GET', 'api.php?url=' + URL_STREAMING + '&streamtype=' + STREAMING_TYPE + '&historic=' + HISTORIC + '&next=' + NEXT_SONG + '&t=' + d.getTime(), true);
-    xhttp.send();
-}
